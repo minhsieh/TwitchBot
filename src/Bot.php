@@ -12,6 +12,8 @@ class Bot
     private $name, $nick, $mask, $nickToUse, $pass;
     private $nickCounter = 1;
     private $channels = [];
+    private $loop;
+    private $debug = false;
 
     private $socket;
     
@@ -64,7 +66,7 @@ class Bot
     public function getData()
     {
         $data = fgets($this->socket, 256);
-        echo $data;
+        if($this->debug && !empty($data)) echo "[".date("Y-m-d H:i:s")."] ".$data;
         return $data;
     }
 
@@ -109,13 +111,10 @@ class Bot
             }
         }
 
-
         // Main Loop
-
-        while(true){
-            $data = $this->getData();
-        }
-        
+        if ($this->loop) {
+			call_user_func($this->loop, $pno , $this);
+		}
     }
 
     private function joinChannel($channel)
@@ -182,6 +181,16 @@ class Bot
     public function setChannel($channel)
     {
         $this->channels = (array) $channel;
+    }
+
+    public function setLoop($loop)
+    {
+        $this->loop = $loop;
+    }
+
+    public function setDebug($boolean = true)
+    {
+        $this->debug = $boolean;
     }
 
     private function colour($line)

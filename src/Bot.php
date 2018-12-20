@@ -211,5 +211,11 @@ class Bot
                                     chr(3)."15$1".chr(3)."\t", "\2$1\2", "\37$1\37"),
                                     $line);
     }
+
+    public function sendMessage($channel , $message)
+    {
+        if(substr($channel, 0, 1) != '#') $channel = '#'.$channel;
+        $this->sendData('PRIVMSG '.$channel.' :'.$message);
+    }
 }
 ?>

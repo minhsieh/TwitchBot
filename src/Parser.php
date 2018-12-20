@@ -29,7 +29,7 @@ class Parser
 
         $parsed = self::$dummy;
         $parsed['raw'] = $data;
-
+        
         $parts = explode(' ', $data, 3);
 
         // Setup the prefix, type and parameters variables in the return array

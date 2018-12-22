@@ -60,13 +60,14 @@ class Bot
     public function sendData($data)
     {
         $data = $this->colour($data);
+        if($this->debug && !empty($data)) echo "[".date("Y-m-d H:i:s")."] < ".$data.PHP_EOL;
         return fwrite($this->socket, $data . "\r\n");
     }
 
     public function getData()
     {
-        $data = fgets($this->socket, 256);
-        if($this->debug && !empty($data)) echo "[".date("Y-m-d H:i:s")."] ".$data;
+        $data = fgets($this->socket, 2048);
+        if($this->debug && !empty($data)) echo "[".date("Y-m-d H:i:s")."] > ".$data;
         return $data;
     }
 
@@ -110,6 +111,10 @@ class Bot
                 die();
             }
         }
+
+        $this->sendData('CAP REQ :twitch.tv/tags');
+        $this->sendData('CAP REQ :twitch.tv/commands');
+        $this->sendData('CAP REQ :twitch.tv/memberships');
 
         // Main Loop
         if ($this->loop) {

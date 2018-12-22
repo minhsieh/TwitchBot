@@ -196,7 +196,9 @@ class Parser
         $nick = "(?:[\\*$letter$special][$letter$number$special-]*)";
         $user = "(?:[^ $null$crlf@]+)";
         $prefix = "(?:(?:(?P<nick>$nick)(?:!(?P<user>$user))?(?:@(?P<host>$host))?)|(?P<servername>$host))";
-        $message = "(?P<prefix>:$prefix )?$type$params$crlf";
+        $tags = "(@(?P<tags>\S+) )?";
+        $message = "$tags(?P<prefix>:$prefix )?$type$params$crlf";
+
         $this->message = "/^$message\$/SU";
 
         $chstring = "[^ \a$null,$crlf]+";
@@ -265,7 +267,7 @@ class Parser
             'TIME'       => "/^(?::(?P<time>$trailing))$/",
             'ACTION'       => "/^(?::(?P<action>$trailing))$/",
         );
-        $this->commandReg = '/^!(?P<command>\S+)(\s+(?P<args>.+))?$/';
+        $this->commandReg = '/^(?P<command>\S+)(\s+(?P<args>.+))?$/';
     }
 
     /**
@@ -380,6 +382,15 @@ class Parser
                         $parsed['command'] = $parsed_command['command'];
                         $parsed['args'] = (empty($parsed_command['args']))? "" : $parsed_command['args'];
                     }
+                    if(isset($parsed['tags'])){
+                        $tags = explode(";",$parsed['tags']);
+                        $output = [];
+                        foreach($tags as $tag){
+                            $temp = explode("=",$tag);
+                            $output[($temp[0])] = (!empty($temp[1])) ? $temp[1] : "" ;
+                        }
+                        $parsed['tags'] = $output;
+                    }
                     break;
                 case 'NOTICE':
                     if ($params && preg_match($this->typeReg, end($params), $type)) {
@@ -437,6 +448,9 @@ class Parser
 
         // Store the remainder of the original data stream
         $parsed['tail'] = $buf;
+        list($usec, $sec) = explode(" ", microtime());
+        $parsed['receive_ts'] =  ((float)$usec + (float)$sec);
+        $parsed['receive_dt'] = date("Y-m-d H:i:s");
 
         // Clean up and return the response
         $parsed = $this->removeIntegerKeys($parsed);

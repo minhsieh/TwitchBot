@@ -193,7 +193,7 @@ class Parser
         $trailing = "(?: :?[^$null$crlf]*)";
         $params = "(?P<params>$trailing?|(?:$middle{0,14}$trailing))";
         $host = '[^ ]+';
-        $nick = "(?:[\\*$letter$special][$letter$number$special-]*)";
+        $nick = "(?:[\\*$letter$number$special][$letter$number$special-]*)";
         $user = "(?:[^ $null$crlf@]+)";
         $prefix = "(?:(?:(?P<nick>$nick)(?:!(?P<user>$user))?(?:@(?P<host>$host))?)|(?P<servername>$host))";
         $tags = "(@(?P<tags>\S+) )?";
